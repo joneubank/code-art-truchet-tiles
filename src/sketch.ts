@@ -69,13 +69,17 @@ const draw = ({ canvas, palette, params, rng }: SketchProps) => {
       // Use (near) white
       return new Color('#eee');
     }
+
+    // The order that the path colours are generated in can change when `hideCrosses` is true,
+    //  so we want a defined seed for each path. The consequence of this is that the TruchetTiles
+    //  class also randomizes the first path number used in its generation
     rng.push(`path color - ${path}`, { seed: `${path}` });
     if (pathColors[path]) {
       return pathColors[path];
     }
     const color = fuzzyColor(palette.colors[rng.int(0, numColors - 1)]);
     pathColors[path] = color;
-
+    rng.pop();
     return color;
   };
 

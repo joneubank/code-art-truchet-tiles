@@ -220,6 +220,10 @@ export default class TruchetTiles {
     this.width = width;
     this.height = height;
     this.allowCross = allowCross;
+
+    // Random number used as first path ID -
+    //   path IDs are used as seed for colour selection, so randomizing the IDs
+    //   keeps the path colours in the top right corner unpredictable
     this.pathSeed = rng.int(0, 100);
 
     this.tiles = array(this.width).map((x) =>
