@@ -35,9 +35,7 @@ function randomOrientation(rng: Random, allowCross: boolean): TileOrientation {
     case 2:
       return TileOrientation.LeftRight;
     default:
-      console.log(
-        `Impossible code block reached!!! Random orientation out of range was selected.`,
-      );
+      console.log(`Impossible code block reached!!! Random orientation out of range was selected.`);
       return TileOrientation.LeftDown;
   }
 }
@@ -87,10 +85,7 @@ function getTilePathIndex(side: TileSide, orientation: TileOrientation): 0 | 1 {
  * @param orientation
  * @returns
  */
-function getTilePathNextEntry(
-  side: TileSide,
-  orientation: TileOrientation,
-): TileSide {
+function getTilePathNextEntry(side: TileSide, orientation: TileOrientation): TileSide {
   switch (side) {
     case TileSide.Left:
       switch (orientation) {
@@ -151,10 +146,7 @@ function getTilePathNextEntry(
  * @param orientation
  * @returns {x: number, y: number}
  */
-function getTilePathCoordinateMods(
-  side: TileSide,
-  orientation: TileOrientation,
-): { x: -1 | 0 | 1; y: -1 | 0 | 1 } {
+function getTilePathCoordinateMods(side: TileSide, orientation: TileOrientation): { x: -1 | 0 | 1; y: -1 | 0 | 1 } {
   switch (side) {
     case TileSide.Left:
       switch (orientation) {
@@ -205,7 +197,7 @@ function getTilePathCoordinateMods(
 }
 
 type TilePathRecord = [number | undefined, number | undefined];
-type Tile = {
+export type Tile = {
   x: number;
   y: number;
   orientation: TileOrientation;
@@ -222,14 +214,13 @@ export default class TruchetTiles {
   height: number;
   allowCross: boolean;
   tiles: Tile[][];
+  pathSeed: number;
 
-  constructor(
-    { width, height, allowCross = false }: TruchetParams,
-    rng: Random = new Random('truchet tiles'),
-  ) {
+  constructor({ width, height, allowCross = false }: TruchetParams, rng: Random = new Random('truchet tiles')) {
     this.width = width;
     this.height = height;
     this.allowCross = allowCross;
+    this.pathSeed = rng.int(0, 100);
 
     this.tiles = array(this.width).map((x) =>
       array(this.height).map((y) => ({
@@ -244,8 +235,8 @@ export default class TruchetTiles {
   }
 
   updateTilePaths() {
-    let path: number = 0;
-    let maxPath: number = 0;
+    let path: number = this.pathSeed;
+    let maxPath: number = this.pathSeed;
 
     // 0-left, 1-top, 2-right, 3-bottom
     let nextEntry = 0;
@@ -289,12 +280,7 @@ export default class TruchetTiles {
           addPathToTile(nextEntry, nextX, nextY);
           do {
             // break if we are left with coordinates outside of our grid
-            if (
-              nextX < 0 ||
-              nextX >= self.width ||
-              nextY < 0 ||
-              nextY >= self.height
-            ) {
+            if (nextX < 0 || nextX >= self.width || nextY < 0 || nextY >= self.height) {
               break;
             }
           } while (addPathToTile(nextEntry, nextX, nextY));
