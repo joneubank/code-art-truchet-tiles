@@ -10,17 +10,18 @@ const config = Config({
 
 const params: Parameter[] = [
   Params.header('Grid'),
-  Params.range('imageFill', 1),
-  Params.range('gridWidth', 11, { max: 128, min: 3, step: 1 }),
+  Params.range('imageFill', 0.9),
+  Params.range('gridWidth', 19, { max: 128, min: 3, step: 1 }),
+
   Params.header('Paths'),
-  Params.range('numColors', 2, { max: 5, min: 0, step: 1 }),
-  Params.range('strokeFill', 0.3),
+  Params.range('numColors', 3, { max: 5, min: 0, step: 1 }),
+  Params.range('strokeFill', 0.4),
   Params.range('colorFuzz', 0.3, { min: 0, max: 20, step: 0.25 }),
   Params.checkbox('rounded', true),
 
   Params.header('Crosses'),
-  Params.checkbox('allowCrosses', true),
-  Params.checkbox('hideCrosses', true),
+  Params.checkbox('allowCrosses', false),
+  Params.checkbox('hideCrosses', false),
   Params.range('hideHorizontalChance', 0.5),
 ];
 
