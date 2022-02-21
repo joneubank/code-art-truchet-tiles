@@ -18,6 +18,7 @@ const params: Parameter[] = [
   Params.range('strokeFill', 0.4),
   Params.range('colorFuzz', 0.3, { min: 0, max: 20, step: 0.25 }),
   Params.checkbox('rounded', true),
+  Params.checkbox('solidColors', true),
 
   Params.header('Crosses'),
   Params.checkbox('allowCrosses', false),
@@ -33,8 +34,10 @@ const draw = ({ canvas, palette, params, rng }: SketchProps) => {
 
   const numColors = params.numColors as number;
   const strokeFill = params.strokeFill as number;
-  const rounded = params.rounded as boolean;
   const colorFuzz = params.colorFuzz as number;
+  const rounded = params.rounded as boolean;
+  const solidColors = params.solidColors as boolean;
+
   const allowCrosses = params.allowCrosses as boolean;
   const hideCrosses = params.hideCrosses as boolean;
   const hideHorizontalChance = params.hideHorizontalChance as number;
@@ -73,10 +76,11 @@ const draw = ({ canvas, palette, params, rng }: SketchProps) => {
     // The order that the path colours are generated in can change when `hideCrosses` is true,
     //  so we want a defined seed for each path. The consequence of this is that the TruchetTiles
     //  class also randomizes the first path number used in its generation
-    rng.push(`path color - ${path}`, { seed: `${path}` });
     if (pathColors[path]) {
       return pathColors[path];
     }
+
+    rng.push(`path color - ${path}`, { seed: `${path}` });
     const color = fuzzyColor(palette.colors[rng.int(0, numColors - 1)]);
     pathColors[path] = color;
     rng.pop();
@@ -90,14 +94,16 @@ const draw = ({ canvas, palette, params, rng }: SketchProps) => {
     canvas.draw.path({
       path,
       stroke: {
-        color: getPathColor(pathId),
+        color: solidColors ? getPathColor(pathId) : fuzzyColor(getPathColor(pathId)),
         width: strokeFill * tileWidth,
         cap: rounded ? 'round' : 'square',
       },
     });
   };
 
-  function drawTile(tile: Tile, x: number, y: number) {
+  function drawTile(tile: Tile) {
+    const { x, y } = tile;
+
     // for each tile make an array of their lines as drawable paths and their path ID
     let paths: [Path, number][] = [];
 
@@ -143,11 +149,8 @@ const draw = ({ canvas, palette, params, rng }: SketchProps) => {
     rng.shuffle(paths).forEach((pathData) => drawPath(pathData[0], pathData[1]));
   }
 
-  repeat(tileSet.width, (x) => {
-    repeat(tileSet.height, (y) => {
-      drawTile(tileSet.tiles[x][y], x, y);
-    });
-  });
+  const shuffledTiles = rng.shuffle(tileSet.tiles.flat());
+  shuffledTiles.forEach(drawTile);
 };
 
 export default Sketch({
